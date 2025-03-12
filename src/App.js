@@ -1,9 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom"; // Import de Routes et Route pour la version 6
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Import de Routes et Route pour la version 6
 import Navbar from "./components/Navbar";
-import Card from "./components/Card";
+// import Card from "./components/Card";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 import "./styles.css";
 
 function App() {
@@ -11,20 +12,6 @@ function App() {
     <Router>
       <div className="app">
         <Navbar />
-        <div className="grid">
-          <Link to="/profil">
-            <Card image="/images/profil.png" title="PROFIL" />
-          </Link>
-          <Link to="/sport-program">
-            <Card image="/images/sport.png" title="SPORT PROGRAM" />
-          </Link>
-          <Link to="/dietetic">
-            <Card image="/images/dietetic.png" title="DIETETIC" />
-          </Link>
-          <Link to="/bmi">
-            <Card image="/images/bmi.png" title="BMI" />
-          </Link>
-        </div>
         {/* Utilisation de Routes au lieu de Switch */}
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -36,7 +23,7 @@ function App() {
           />
           <Route path="/dietetic" element={<div>Page Dietetic</div>} />
           <Route path="/bmi" element={<div>Page BMI</div>} />
-          <Route path="/" />
+          <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
     </Router>
