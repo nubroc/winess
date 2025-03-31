@@ -8,6 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import "./styles.css";
 import Welcome from "./pages/Welcome";
 import BMI from "./pages/BMI";
+import SportProgram from "./pages/SportProgram";
+
 
 
 
@@ -23,6 +25,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profil" element={<div>Page Profil</div>} />
           <Route path="/bmi" element={<BMI />} />
+          <Route path="/sport-program" element={<SportProgram />} />
           <Route
             path="/sport-program"
             element={<div>Page Sport Program</div>}
