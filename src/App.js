@@ -4,14 +4,12 @@ import Navbar from "./components/Navbar";
 // import Card from "./components/Card";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dietetic from "./pages/Dietetic";
 import Dashboard from "./pages/Dashboard";
 import "./styles.css";
 import Welcome from "./pages/Welcome";
 import BMI from "./pages/BMI";
 import SportProgram from "./pages/SportProgram";
-
-
-
 
 function App() {
   return (
@@ -30,7 +28,7 @@ function App() {
             path="/sport-program"
             element={<div>Page Sport Program</div>}
           />
-          <Route path="/dietetic" element={<div>Page Dietetic</div>} />
+          <Route path="/dietetic" element={<Dietetic />} />
           <Route path="/bmi" element={<div>Page BMI</div>} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
