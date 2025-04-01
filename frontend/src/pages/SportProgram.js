@@ -2,50 +2,98 @@ import { useEffect, useState } from "react";
 
 const SportProgram = () => {
   const [imc, setImc] = useState(null);
+  const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Programmes associés à l'IMC
+  const programs = [
+    {
+      range: [0, 18.5],
+      name: "Programme prise de masse",
+      image: "https://i.imgur.com/jEWuGvK.png",
+    },
+    {
+      range: [18.5, 25],
+      name: "Programme maintien & renforcement",
+      image: "https://i.imgur.com/L0Rb5br.png",
+    },
+    {
+      range: [25, 30],
+      name: "Programme perte de poids",
+      image: "https://i.imgur.com/dNGZ2dM.png",
+    },
+    {
+      range: [30, 100],
+      name: "Programme intensif + suivi diététique",
+      image: "https://i.imgur.com/oBXgJVA.png",
+    },
+  ];
+
+  const getProgramForIMC = (value) => {
+    return programs.find((p) => value >= p.range[0] && value < p.range[1]);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
+    // 1. Récupère l'IMC
     fetch("http://localhost:5000/imc", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
         setImc(data.imc);
-        setLoading(false);
+        const selected = getProgramForIMC(data.imc);
+        setProgram(selected);
+
+        // 2. Vérifie s’il y a déjà un programme en BDD
+        fetch("http://localhost:5000/program", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((res) => {
+            if (res.status === 404) {
+              // 3. Si pas de programme en BDD, enregistre-le
+              fetch("http://localhost:5000/program", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  imc: data.imc,
+                  programme: selected.name,
+                  image_url: selected.image,
+                }),
+              })
+                .then(() => console.log("✅ Programme enregistré"))
+                .catch((err) => console.error("Erreur enregistrement :", err));
+            }
+          })
+          .catch((err) => console.error("Erreur vérif programme :", err));
       })
-      .catch((err) => {
-        console.error("Erreur récupération IMC :", err);
-        setLoading(false);
-      });
+      .catch((err) => console.error("Erreur récupération IMC :", err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const getProgramme = () => {
-    if (!imc) return "Aucun programme disponible";
-
-    if (imc < 18.5) return "Programme prise de masse (débutant)";
-    if (imc < 25) return "Programme classique de maintien";
-    if (imc < 30) return "Programme perte de poids";
-    return "Programme intensif + suivi nutritionnel";
-  };
-
   return (
-    <div style={{ color: "white", textAlign: "center", paddingTop: "2rem" }}>
-      <h2>Page Sport Program</h2>
+    <div style={{ color: "white", textAlign: "center", padding: "2rem" }}>
+      <h2>Mon Programme Sportif</h2>
+
       {loading ? (
         <p>Chargement...</p>
-      ) : imc ? (
+      ) : imc && program ? (
         <>
-          <p>Votre IMC est : <strong>{imc}</strong></p>
-          <p>Programme recommandé :</p>
-          <h3 style={{ color: "orange" }}>{getProgramme()}</h3>
+          <p>Votre IMC : <strong>{imc}</strong></p>
+          <h3>{program.name}</h3>
+          <img
+            src={program.image}
+            alt={program.name}
+            style={{ width: "300px", borderRadius: "10px", marginTop: "1rem" }}
+          />
         </>
       ) : (
-        <p>Aucun IMC trouvé. Veuillez d'abord le calculer.</p>
+        <p>Aucun programme disponible. Merci de remplir votre IMC dans la section "Calcul IMC".</p>
       )}
     </div>
   );
