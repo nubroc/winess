@@ -25,9 +25,9 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Connexion</h2>
-      <form onSubmit={handleLogin}>
+    <div className="login-container">
+      <h2 className="login-title">Connexion</h2>
+      <form className="login-form" onSubmit={handleLogin}>
         <input
           type="text"
           placeholder="Nom d'utilisateur"
@@ -44,8 +44,10 @@ const Login = () => {
         />
         <button type="submit">Se connecter</button>
       </form>
-      <p>{message}</p>
-      <p>
+
+      {message && <p className="login-message">{message}</p>}
+
+      <p className="login-register">
         Pas de compte ? <Link to="/register">Inscrivez-vous</Link>
       </p>
     </div>
