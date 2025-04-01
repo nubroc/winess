@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+
 const Dietetic = () => {
   const [weight, setWeight] = useState(70);
   const [program, setProgram] = useState("");
@@ -20,7 +21,7 @@ const Dietetic = () => {
         "Programme équilibré : Apport en protéines, lipides et glucides modérés."
       );
       setRecipes([
-        { name: "Pâtes complètes au saumon", image: "/images/salmon_pasta.png", grammage: "300g" },
+        { name: "Pâtes complètes au saumon", image: "/images/salmon.png", grammage: "300g" },
         { name: "Omelette aux épinards et fromage", image: "/images/omelette.png", grammage: "200g" },
         { name: "Poulet rôti avec patates douces", image: "/images/chicken.png", grammage: "350g" },
       ]);
