@@ -12,7 +12,7 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="logo">winess</div>
+      <a href="/" className="logo">winess</a>
 
       <div className="buttons">
         {!token ? (

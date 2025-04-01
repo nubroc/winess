@@ -23,6 +23,8 @@ function App() {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
           <Route path="/profil" element={<div>Page Profil</div>} />
           <Route path="/bmi" element={<BMI />} />
           <Route path="/sport-program" element={<SportProgram />} />
