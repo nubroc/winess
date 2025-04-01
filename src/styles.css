@@ -31,6 +31,11 @@ body {
   padding: 10px 20px;
   margin-left: 10px;
   cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.buttons button:hover {
+  background-color: #c7aa2c;
 }
 
 /*.grid {
@@ -101,4 +106,60 @@ body {
 
 .second {
   flex: 1 1 70%;
+}
+
+/* Formulaire*/
+form {
+  max-width: 400px; /* Largeur maximale du formulaire */
+  margin: 0 auto; /* Centrage du formulaire */
+  padding: 20px; /* Espacement interne */
+  background-color: #f9f9f92d; /* Couleur de fond claire */
+  border-radius: 8px; /* Coins arrondis */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre subtile pour l'effet 3D */
+}
+
+form h2 {
+  text-align: center; /* Centrer le titre */
+  margin-bottom: 20px; /* Marge sous le titre */
+  font-size: 24px; /* Taille de la police */
+  color: #333; /* Couleur du texte */
+}
+
+form input {
+  color: #ffffff;
+  width: 100%; /* Champs qui prennent toute la largeur du formulaire */
+  padding: 12px; /* Espacement interne des champs */
+  margin: 10px 0; /* Espacement vertical entre les champs */
+  border: none; /* Bordure grise */
+  border-radius: 4px; /* Coins arrondis */
+  font-size: 16px; /* Taille de police */
+  background-color: #ffffff3f;
+  box-sizing: border-box; /* Inclure le padding dans la largeur */
+}
+
+form input:focus {
+  outline: none; /* Enlever le contour par défaut */
+  border-color: #fdd835; /* Bordure verte lors du focus */
+  box-shadow: 0 0 5px rgba(0, 128, 0, 0.2); /* Ombre verte autour du champ */
+}
+
+form button {
+  width: 100%; /* Bouton qui prend toute la largeur */
+  padding: 12px; /* Espacement interne du bouton */
+  background-color: #fdd835; /* Couleur de fond verte */
+  color: black; /* Couleur du texte */
+  border: none; /* Enlever la bordure */
+  border-radius: 4px; /* Coins arrondis */
+  font-size: 16px; /* Taille de la police du bouton */
+  cursor: pointer; /* Curseur en forme de main */
+  transition: background-color 0.3s ease; /* Animation au survol */
+}
+
+form input::placeholder {
+  color: #ffffff; /* Couleur du texte du placeholder (gris clair ici) */
+  opacity: 1; /* Assure que le placeholder a une opacité de 1 (non transparent) */
+}
+
+form button:hover {
+  background-color: #c7aa2c; /* Couleur légèrement plus foncée au survol */
 }
