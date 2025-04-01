@@ -213,3 +213,94 @@ form button:hover {
   color: #fdd835;
   border-radius: 5px;
 }
+
+
+/* Dietetic.css */
+
+.dietetic-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  color: white;
+}
+
+.dietetic-container h2 {
+  text-align: center;
+  color: #facc15;
+}
+
+.dietetic-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #1f1f1f;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.dietetic-form input {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+.dietetic-form button {
+  padding: 0.75rem;
+  background-color: #facc15;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+}
+
+.program-result {
+  margin-top: 2rem;
+  background-color: #111;
+  padding: 1rem;
+  border-radius: 8px;
+  font-style: italic;
+  text-align: center;
+  color: #a3e635;
+}
+
+.recipes {
+  margin-top: 2rem;
+}
+
+.recipes h3 {
+  text-align: center;
+}
+
+.recipe-card {
+  background: #222;
+  border-radius: 10px;
+  padding: 1rem;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.recipe-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.recipe-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-card h4 {
+  color: #facc15;
+}
+
+.recipe-card p {
+  color: #ccc;
+}
