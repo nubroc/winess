@@ -9,6 +9,17 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Ajout de headers CORS personnalisés pour autoriser les tokens
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+});
+
+// 🔌 Connexion à la base de données
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -24,10 +35,11 @@ db.connect((err) => {
   }
 });
 
-// 🔐 Middleware JWT
+// 🔐 Middleware de vérification du token JWT
 function authenticateToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
@@ -37,7 +49,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// ✅ Route test DB
+// ✅ Test de connexion à la BDD
 app.get("/test-db", (req, res) => {
   db.query("SELECT 1", (err) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
@@ -82,12 +94,16 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ✅ Infos utilisateur
+// ✅ Récupération du profil
 app.get("/profile", authenticateToken, (req, res) => {
-  db.query("SELECT username, email FROM users WHERE id = ?", [req.user.id], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results[0]);
-  });
+  db.query(
+    "SELECT username, email FROM users WHERE id = ?",
+    [req.user.id],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(results[0]);
+    }
+  );
 });
 
 // ✅ Enregistrement de l’IMC
@@ -108,7 +124,7 @@ app.post("/imc", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Récupération du dernier IMC
+// ✅ Dernier IMC
 app.get("/imc", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -123,27 +139,21 @@ app.get("/imc", authenticateToken, (req, res) => {
   );
 });
 
-app.post("/diet", authenticateToken, (req, res) => {
-  const { weight, program, recipes } = req.body;
+// ✅ Historique IMC
+app.get("/imc/history", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
-  console.log("Saving diet program:", { userId, weight, program, recipes }); // Debug log
-
   db.query(
-    "INSERT INTO user_diets (user_id, weight, program, recipes) VALUES (?, ?, ?, ?)",
-    [userId, weight, program, JSON.stringify(recipes)],
+    "SELECT taille, poids, imc, age, created_at FROM user_metrics WHERE user_id = ? ORDER BY created_at ASC",
+    [userId],
     (err, results) => {
-      if (err) {
-        console.error("Erreur INSERT Diet:", err); // Log the error
-        return res.status(500).json({ error: err.message });
-      }
-      console.log("Diet program saved successfully:", results); // Log success
-      res.status(201).json({ message: "Programme diététique enregistré" });
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(results);
     }
   );
 });
 
-// ✅ Enregistrement d’un programme sportif personnalisé
+// ✅ Programme sportif
 app.post("/program", authenticateToken, (req, res) => {
   const { imc, programme, image_url } = req.body;
   const userId = req.user.id;
@@ -161,7 +171,6 @@ app.post("/program", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Récupération du programme sportif du user
 app.get("/program", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -176,7 +185,25 @@ app.get("/program", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Lancement serveur
+// ✅ Programme diététique (bonus)
+app.post("/diet", authenticateToken, (req, res) => {
+  const { weight, program, recipes } = req.body;
+  const userId = req.user.id;
+
+  db.query(
+    "INSERT INTO user_diets (user_id, weight, program, recipes) VALUES (?, ?, ?, ?)",
+    [userId, weight, program, JSON.stringify(recipes)],
+    (err) => {
+      if (err) {
+        console.error("Erreur INSERT Diet:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: "Programme diététique enregistré" });
+    }
+  );
+});
+
+// ✅ Lancement du serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur backend démarré sur le port ${PORT}`);

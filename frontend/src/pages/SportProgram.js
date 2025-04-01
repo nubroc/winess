@@ -1,31 +1,37 @@
 import { useEffect, useState } from "react";
 
+// ✅ Importation d’images locales (chemin relatif au fichier)
+import priseMasse from "./images/prise_masse.png";
+import maintien from "./images/renforcement.png";
+import pertePoids from "./images/perte_poids.png";
+import intensif from "./images/intensif.png";
+
 const SportProgram = () => {
   const [imc, setImc] = useState(null);
   const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Programmes associés à l'IMC
+  // ✅ Liste des programmes associés aux tranches d'IMC
   const programs = [
     {
       range: [0, 18.5],
       name: "Programme prise de masse",
-      image: "/images/prise_masse.png",
+      image: priseMasse,
     },
     {
       range: [18.5, 25],
       name: "Programme maintien & renforcement",
-      image: "/images/renforcement.png",
+      image: maintien,
     },
     {
       range: [25, 30],
       name: "Programme perte de poids",
-      image: "/images/perte_poids.png",
+      image: pertePoids,
     },
     {
       range: [30, 100],
       name: "Programme intensif + suivi diététique",
-      image: "/images/intensif.png",
+      image: intensif,
     },
   ];
 
@@ -37,7 +43,7 @@ const SportProgram = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    // 1. Récupère l'IMC
+    // Étape 1 : Récupérer l’IMC
     fetch("http://localhost:5000/imc", {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -47,13 +53,13 @@ const SportProgram = () => {
         const selected = getProgramForIMC(data.imc);
         setProgram(selected);
 
-        // 2. Vérifie s’il y a déjà un programme en BDD
+        // Étape 2 : Vérifier si un programme existe déjà en base
         fetch("http://localhost:5000/program", {
           headers: { Authorization: `Bearer ${token}` },
         })
           .then((res) => {
             if (res.status === 404) {
-              // 3. Si pas de programme en BDD, enregistre-le
+              // Étape 3 : Sinon, on l’enregistre
               fetch("http://localhost:5000/program", {
                 method: "POST",
                 headers: {
@@ -63,7 +69,7 @@ const SportProgram = () => {
                 body: JSON.stringify({
                   imc: data.imc,
                   programme: selected.name,
-                  image_url: selected.image,
+                  image_url: selected.image, // Stocké aussi en base si besoin
                 }),
               })
                 .then(() => console.log("✅ Programme enregistré"))
@@ -78,14 +84,14 @@ const SportProgram = () => {
 
   return (
     <div style={{ color: "white", textAlign: "center", padding: "2rem" }}>
-      <h2>Mon Programme Sportif</h2>
+      <h2 style={{ color: "gold" }}>Mon Programme Sportif</h2>
 
       {loading ? (
         <p>Chargement...</p>
       ) : imc && program ? (
         <>
-          <p>Votre IMC : <strong>{imc}</strong></p>
-          <h3>{program.name}</h3>
+          <p>Votre IMC : <strong>{imc.toFixed(2)}</strong></p>
+          <h3 style={{ marginTop: "1rem" }}>{program.name}</h3>
           <img
             src={program.image}
             alt={program.name}
