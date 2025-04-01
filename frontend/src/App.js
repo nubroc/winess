@@ -1,7 +1,6 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Import de Routes et Route pour la version 6
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-// import Card from "./components/Card";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dietetic from "./pages/Dietetic";
@@ -16,7 +15,6 @@ function App() {
     <Router>
       <div className="app">
         <Navbar />
-        {/* Utilisation de Routes au lieu de Switch */}
         <Routes>
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/login" element={<Login />} />

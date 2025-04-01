@@ -9,7 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connexion à MySQL
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -25,7 +24,6 @@ db.connect((err) => {
   }
 });
 
-// Test DB
 app.get("/test-db", (req, res) => {
   db.query("SELECT 1", (err) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
@@ -33,7 +31,6 @@ app.get("/test-db", (req, res) => {
   });
 });
 
-// Auth Middleware
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -46,7 +43,6 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Enregistrement
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -66,7 +62,6 @@ app.post("/register", async (req, res) => {
   });
 });
 
-// Connexion
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -83,7 +78,6 @@ app.post("/login", (req, res) => {
   });
 });
 
-// Profil utilisateur
 app.get("/profile", authenticateToken, (req, res) => {
   db.query("SELECT username, email FROM users WHERE id = ?", [req.user.id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -91,7 +85,6 @@ app.get("/profile", authenticateToken, (req, res) => {
   });
 });
 
-// ➕ Enregistrer l’IMC
 app.post("/imc", authenticateToken, (req, res) => {
   const { taille, poids, imc, age } = req.body;
   const userId = req.user.id;
@@ -109,7 +102,6 @@ app.post("/imc", authenticateToken, (req, res) => {
   );
 });
 
-// 🔍 Récupérer le dernier IMC
 app.get("/imc", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -124,7 +116,6 @@ app.get("/imc", authenticateToken, (req, res) => {
   );
 });
 
-// 🚀 Lancer le serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur backend démarré sur le port ${PORT}`);

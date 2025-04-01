@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const Dietetic = () => {
-  const [weight, setWeight] = useState(70); // Poids par défaut
+  const [weight, setWeight] = useState(70);
   const [program, setProgram] = useState("");
   const [recipes, setRecipes] = useState([]);
 

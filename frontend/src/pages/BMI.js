@@ -46,7 +46,6 @@ const BMI = () => {
     };
     setBmiList((prev) => [...prev, newEntry]);
 
-    // 🔐 Envoi vers le backend
     const token = localStorage.getItem("token");
     if (token) {
       fetch("http://localhost:5000/imc", {
@@ -67,7 +66,6 @@ const BMI = () => {
         .catch((err) => console.error("❌ Erreur enregistrement IMC :", err));
     }
 
-    // reset inputs
     setTaille("");
     setPoids("");
     setAge("");

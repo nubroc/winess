@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom"; // Import de Routes et Route pour la version 6
+import { Link } from "react-router-dom";
 import Card from "../components/Card";
 
 const Dashboard = () => {
