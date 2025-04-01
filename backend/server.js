@@ -116,6 +116,26 @@ app.get("/imc", authenticateToken, (req, res) => {
   );
 });
 
+app.post("/diet", authenticateToken, (req, res) => {
+  const { weight, program, recipes } = req.body;
+  const userId = req.user.id;
+
+  console.log("Saving diet program:", { userId, weight, program, recipes }); // Debug log
+
+  db.query(
+    "INSERT INTO user_diets (user_id, weight, program, recipes) VALUES (?, ?, ?, ?)",
+    [userId, weight, program, JSON.stringify(recipes)],
+    (err, results) => {
+      if (err) {
+        console.error("Erreur INSERT Diet:", err); // Log the error
+        return res.status(500).json({ error: err.message });
+      }
+      console.log("Diet program saved successfully:", results); // Log success
+      res.status(201).json({ message: "Programme diététique enregistré" });
+    }
+  );
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur backend démarré sur le port ${PORT}`);

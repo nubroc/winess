@@ -11,37 +11,56 @@ const Dietetic = () => {
         "Programme pour poids léger : Repas riches en protéines et glucides."
       );
       setRecipes([
-        "Salade de quinoa et poulet",
-        "Smoothie protéiné aux fruits rouges",
-        "Poêlée de légumes et tofu",
+        { name: "Salade de quinoa et poulet", image: "/images/quinoa.png", grammage: "200g" },
+        { name: "Smoothie protéiné aux fruits rouges", image: "/images/smoothie.png", grammage: "300ml" },
+        { name: "Poêlée de légumes et tofu", image: "/images/tofu.png", grammage: "250g" },
       ]);
     } else if (weight >= 60 && weight < 80) {
       setProgram(
         "Programme équilibré : Apport en protéines, lipides et glucides modérés."
       );
       setRecipes([
-        "Pâtes complètes au saumon",
-        "Omelette aux épinards et fromage",
-        "Poulet rôti avec patates douces",
+        { name: "Pâtes complètes au saumon", image: "/images/salmon_pasta.png", grammage: "300g" },
+        { name: "Omelette aux épinards et fromage", image: "/images/omelette.png", grammage: "200g" },
+        { name: "Poulet rôti avec patates douces", image: "/images/chicken.png", grammage: "350g" },
       ]);
     } else if (weight >= 80 && weight < 100) {
       setProgram(
         "Programme pour prise de masse : Alimentation riche en calories et en protéines."
       );
       setRecipes([
-        "Steak de bœuf avec riz complet",
-        "Porridge aux flocons d'avoine et banane",
-        "Poulet curry avec riz basmati",
+        { name: "Steak de bœuf avec riz complet", image: "/images/steak.png", grammage: "400g" },
+        { name: "Porridge aux flocons d'avoine et banane", image: "/images/porridge.png", grammage: "300g" },
+        { name: "Poulet curry avec riz basmati", image: "/images/curry.png", grammage: "350g" },
       ]);
     } else {
       setProgram(
         "Programme pour perte de poids : Alimentation contrôlée et équilibrée."
       );
       setRecipes([
-        "Soupe aux légumes et lentilles",
-        "Salade composée aux protéines maigres",
-        "Filet de poisson grillé avec légumes vapeur",
+        { name: "Soupe aux légumes et lentilles", image: "/images/soup.png", grammage: "300ml" },
+        { name: "Salade composée aux protéines maigres", image: "/images/salad.png", grammage: "250g" },
+        { name: "Filet de poisson grillé avec légumes vapeur", image: "/images/fish.png", grammage: "300g" },
       ]);
+    }
+
+    saveDietToDatabase();
+  };
+
+  const saveDietToDatabase = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:5000/diet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ weight, program, recipes }),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("✅ Diet program saved:", data))
+        .catch((err) => console.error("❌ Error saving diet program:", err));
     }
   };
 
@@ -69,7 +88,10 @@ const Dietetic = () => {
           <h3>Recettes suggérées :</h3>
           <ul>
             {recipes.map((recipe, index) => (
-              <li key={index}>{recipe}</li>
+              <li key={index}>
+                <img src={recipe.image} alt={recipe.name} width="50" />
+                <span>{recipe.name} - {recipe.grammage}</span>
+              </li>
             ))}
           </ul>
         </div>
