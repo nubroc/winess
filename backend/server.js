@@ -24,13 +24,7 @@ db.connect((err) => {
   }
 });
 
-app.get("/test-db", (req, res) => {
-  db.query("SELECT 1", (err) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
-    res.json({ success: true, message: "Connexion DB OK ✅" });
-  });
-});
-
+// 🔐 Middleware JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -43,6 +37,15 @@ function authenticateToken(req, res, next) {
   });
 }
 
+// ✅ Route test DB
+app.get("/test-db", (req, res) => {
+  db.query("SELECT 1", (err) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    res.json({ success: true, message: "Connexion DB OK ✅" });
+  });
+});
+
+// ✅ Inscription
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -62,6 +65,7 @@ app.post("/register", async (req, res) => {
   });
 });
 
+// ✅ Connexion
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -78,6 +82,7 @@ app.post("/login", (req, res) => {
   });
 });
 
+// ✅ Infos utilisateur
 app.get("/profile", authenticateToken, (req, res) => {
   db.query("SELECT username, email FROM users WHERE id = ?", [req.user.id], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -85,6 +90,7 @@ app.get("/profile", authenticateToken, (req, res) => {
   });
 });
 
+// ✅ Enregistrement de l’IMC
 app.post("/imc", authenticateToken, (req, res) => {
   const { taille, poids, imc, age } = req.body;
   const userId = req.user.id;
@@ -102,6 +108,7 @@ app.post("/imc", authenticateToken, (req, res) => {
   );
 });
 
+// ✅ Récupération du dernier IMC
 app.get("/imc", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -116,6 +123,40 @@ app.get("/imc", authenticateToken, (req, res) => {
   );
 });
 
+// ✅ Enregistrement d’un programme sportif personnalisé
+app.post("/program", authenticateToken, (req, res) => {
+  const { imc, programme, image_url } = req.body;
+  const userId = req.user.id;
+
+  db.query(
+    "INSERT INTO user_programs (user_id, imc, programme, image_url) VALUES (?, ?, ?, ?)",
+    [userId, imc, programme, image_url],
+    (err) => {
+      if (err) {
+        console.error("Erreur INSERT PROGRAM:", err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.status(201).json({ message: "Programme enregistré" });
+    }
+  );
+});
+
+// ✅ Récupération du programme sportif du user
+app.get("/program", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  db.query(
+    "SELECT * FROM user_programs WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (results.length === 0) return res.status(404).json({ message: "Aucun programme trouvé" });
+      res.json(results[0]);
+    }
+  );
+});
+
+// ✅ Lancement serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur backend démarré sur le port ${PORT}`);
