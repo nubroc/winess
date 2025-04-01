@@ -34,7 +34,7 @@ const SportProgram = () => {
   ];
 
   const handleSelect = async (program) => {
-    if (!token) return alert("Connectez-vous pour enregistrer un programme.");
+    if (!token) return;
     setLoading(true);
 
     try {
@@ -45,13 +45,13 @@ const SportProgram = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          imc: 0, // ou vous pouvez mettre null si le backend accepte
+          imc: 0,
           programme: program.name,
           image_url: program.image,
         }),
       });
+
       setSelectedProgram(program.name);
-      alert("✅ Programme sélectionné !");
     } catch (err) {
       console.error("❌ Erreur enregistrement programme :", err);
     } finally {
@@ -71,8 +71,8 @@ const SportProgram = () => {
               background: "#1e1e1e",
               borderRadius: "12px",
               padding: "1rem",
-              boxShadow: "0 0 10px rgba(0,0,0,0.3)",
-              position: "relative",
+              boxShadow: selectedProgram === program.name ? "0 0 10px #22c55e" : "0 0 8px rgba(255,255,255,0.1)",
+              transition: "all 0.3s ease",
             }}
           >
             <img
@@ -96,6 +96,7 @@ const SportProgram = () => {
                 color: "#000",
                 fontWeight: "bold",
                 cursor: "pointer",
+                transition: "background-color 0.3s",
               }}
             >
               {selectedProgram === program.name ? "✅ Sélectionné" : "Choisir"}
