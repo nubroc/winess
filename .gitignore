@@ -1,8 +1,9 @@
-# Node modules (frontend)
+# Node modules
 node_modules/
 
-# Env vars (si tu as un .env côté front un jour)
+# Environnements
 .env
+.env.local
 
 # Build
 build/
@@ -11,7 +12,8 @@ dist/
 # Logs
 *.log
 
-# OS/IDE files
+# IDE & OS
+.vscode/
+.idea/
 .DS_Store
 Thumbs.db
-.vscode/
