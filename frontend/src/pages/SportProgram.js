@@ -10,22 +10,22 @@ const SportProgram = () => {
     {
       range: [0, 18.5],
       name: "Programme prise de masse",
-      image: "https://i.imgur.com/jEWuGvK.png",
+      image: "/images/prise_masse.png",
     },
     {
       range: [18.5, 25],
       name: "Programme maintien & renforcement",
-      image: "https://i.imgur.com/L0Rb5br.png",
+      image: "/images/renforcement.png",
     },
     {
       range: [25, 30],
       name: "Programme perte de poids",
-      image: "https://i.imgur.com/dNGZ2dM.png",
+      image: "/images/perte_poids.png",
     },
     {
       range: [30, 100],
       name: "Programme intensif + suivi diététique",
-      image: "https://i.imgur.com/oBXgJVA.png",
+      image: "/images/intensif.png",
     },
   ];
 
