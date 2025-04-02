@@ -5,10 +5,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dietetic from "./pages/Dietetic";
 import Dashboard from "./pages/Dashboard";
-import "./styles.css";
 import Welcome from "./pages/Welcome";
 import BMI from "./pages/BMI";
 import SportProgram from "./pages/SportProgram";
+import Profile from "./pages/Profile"; // Ajout ici
+import "./styles.css";
 
 function App() {
   return (
@@ -16,21 +17,15 @@ function App() {
       <div className="app">
         <Navbar />
         <Routes>
+          <Route path="/" element={<Dashboard />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
-
-          <Route path="/profil" element={<div>Page Profil</div>} />
+          <Route path="/profil" element={<Profile />} />
           <Route path="/bmi" element={<BMI />} />
           <Route path="/sport-program" element={<SportProgram />} />
-          <Route
-            path="/sport-program"
-            element={<div>Page Sport Program</div>}
-          />
           <Route path="/dietetic" element={<Dietetic />} />
-          <Route path="/bmi" element={<div>Page BMI</div>} />
-          <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
     </Router>

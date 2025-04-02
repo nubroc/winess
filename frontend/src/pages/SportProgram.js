@@ -1,100 +1,110 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { API_BASE_URL } from "../config";
 
 const SportProgram = () => {
-  const [imc, setImc] = useState(null);
-  const [program, setProgram] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Programmes associés à l'IMC
+  const token = localStorage.getItem("token");
+
   const programs = [
     {
       range: [0, 18.5],
       name: "Programme prise de masse",
       image: "/images/prise_masse.png",
+      description: "Pour les personnes en dessous du poids idéal, ce programme vise à développer la masse musculaire et l’appétit de façon saine.",
     },
     {
       range: [18.5, 25],
       name: "Programme maintien & renforcement",
       image: "/images/renforcement.png",
+      description: "Conçu pour entretenir sa condition physique et tonifier son corps sans objectif de perte ou prise de poids.",
     },
     {
       range: [25, 30],
       name: "Programme perte de poids",
       image: "/images/perte_poids.png",
+      description: "Axé sur la combustion des graisses et le renforcement musculaire progressif pour retrouver la forme.",
     },
     {
       range: [30, 100],
       name: "Programme intensif + suivi diététique",
       image: "/images/intensif.png",
+      description: "Un accompagnement renforcé pour les personnes en situation d'obésité, combinant sport et alimentation stricte.",
     },
   ];
 
-  const getProgramForIMC = (value) => {
-    return programs.find((p) => value >= p.range[0] && value < p.range[1]);
+  const handleSelect = async (program) => {
+    if (!token) return;
+    setLoading(true);
+
+    try {
+      await fetch(`${API_BASE_URL}/program`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          imc: 0,
+          programme: program.name,
+          image_url: program.image,
+        }),
+      });
+
+      setSelectedProgram(program.name);
+    } catch (err) {
+      console.error("❌ Erreur enregistrement programme :", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    // 1. Récupère l'IMC
-    fetch("http://localhost:5000/imc", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setImc(data.imc);
-        const selected = getProgramForIMC(data.imc);
-        setProgram(selected);
-
-        // 2. Vérifie s’il y a déjà un programme en BDD
-        fetch("http://localhost:5000/program", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((res) => {
-            if (res.status === 404) {
-              // 3. Si pas de programme en BDD, enregistre-le
-              fetch("http://localhost:5000/program", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  imc: data.imc,
-                  programme: selected.name,
-                  image_url: selected.image,
-                }),
-              })
-                .then(() => console.log("✅ Programme enregistré"))
-                .catch((err) => console.error("Erreur enregistrement :", err));
-            }
-          })
-          .catch((err) => console.error("Erreur vérif programme :", err));
-      })
-      .catch((err) => console.error("Erreur récupération IMC :", err))
-      .finally(() => setLoading(false));
-  }, []);
-
   return (
-    <div style={{ color: "white", textAlign: "center", padding: "2rem" }}>
-      <h2>Mon Programme Sportif</h2>
-
-      {loading ? (
-        <p>Chargement...</p>
-      ) : imc && program ? (
-        <>
-          <p>Votre IMC : <strong>{imc}</strong></p>
-          <h3>{program.name}</h3>
-          <img
-            src={program.image}
-            alt={program.name}
-            style={{ width: "300px", borderRadius: "10px", marginTop: "1rem" }}
-          />
-        </>
-      ) : (
-        <p>Aucun programme disponible. Merci de remplir votre IMC dans la section "Calcul IMC".</p>
-      )}
+    <div style={{ padding: "2rem", color: "white", textAlign: "center" }}>
+      <h2 style={{ marginBottom: "2rem", color: "#facc15" }}>🏋️‍♂️ Choisissez votre programme sportif</h2>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "2rem" }}>
+        {programs.map((program, index) => (
+          <div
+            key={index}
+            style={{
+              width: "260px",
+              background: "#1e1e1e",
+              borderRadius: "12px",
+              padding: "1rem",
+              boxShadow: selectedProgram === program.name ? "0 0 10px #22c55e" : "0 0 8px rgba(255,255,255,0.1)",
+              transition: "all 0.3s ease",
+            }}
+          >
+            <img
+              src={program.image}
+              alt={program.name}
+              style={{ width: "100%", borderRadius: "8px" }}
+            />
+            <h3 style={{ marginTop: "1rem", color: "#facc15" }}>{program.name}</h3>
+            <p style={{ fontStyle: "italic", fontSize: "0.9rem", color: "#ccc" }}>
+              {program.description}
+            </p>
+            <button
+              onClick={() => handleSelect(program)}
+              disabled={loading}
+              style={{
+                marginTop: "1rem",
+                padding: "0.5rem 1rem",
+                backgroundColor: selectedProgram === program.name ? "#22c55e" : "#facc15",
+                border: "none",
+                borderRadius: "8px",
+                color: "#000",
+                fontWeight: "bold",
+                cursor: "pointer",
+                transition: "background-color 0.3s",
+              }}
+            >
+              {selectedProgram === program.name ? "✅ Sélectionné" : "Choisir"}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

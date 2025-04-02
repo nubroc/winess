@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../config"; 
 import {
   LineChart,
   Line,
@@ -13,42 +14,29 @@ const BMI = () => {
   const [taille, setTaille] = useState("");
   const [poids, setPoids] = useState("");
   const [age, setAge] = useState("");
-  const [imc, setImc] = useState(null);
-  const [categorie, setCategorie] = useState("");
-  const [objectifPoids, setObjectifPoids] = useState(null);
+  const [imcData, setImcData] = useState(null);
   const [bmiList, setBmiList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const getCategorie = (imc) => {
-    if (imc < 18.5) return { label: "Maigreur", color: "blue" };
-    if (imc < 25) return { label: "Corpulence normale", color: "green" };
-    if (imc < 30) return { label: "Surpoids", color: "orange" };
-    return { label: "Obésité", color: "red" };
+    if (imc < 18.5) return { label: "Maigreur", color: "white" };
+    if (imc < 25) return { label: "Corpulence normale", color: "white" };
+    if (imc < 30) return { label: "Surpoids", color: "white" };
+    return { label: "Obésité", color: "white" };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const tailleM = parseFloat(taille) / 100;
     const poidsKg = parseFloat(poids);
     const result = parseFloat((poidsKg / (tailleM * tailleM)).toFixed(2));
-    setImc(result);
-
-    const cat = getCategorie(result);
-    setCategorie(cat);
-
-    const poidsCible = 24.9 * (tailleM * tailleM);
-    const diff = (poidsKg - poidsCible).toFixed(1);
-    setObjectifPoids(diff > 0 ? diff : 0);
-
-    const newEntry = {
-      date: new Date().toLocaleTimeString(),
-      imc: result,
-    };
-    setBmiList((prev) => [...prev, newEntry]);
-
     const token = localStorage.getItem("token");
-    if (token) {
-      fetch("http://localhost:5000/imc", {
+
+    if (!token) return alert("Veuillez vous connecter.");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/imc`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,10 +48,14 @@ const BMI = () => {
           imc: result,
           age,
         }),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("✅ IMC enregistré :", data))
-        .catch((err) => console.error("❌ Erreur enregistrement IMC :", err));
+      });
+
+      const data = await res.json();
+      console.log("✅ IMC enregistré :", data);
+      fetchIMC();
+      fetchHistory();
+    } catch (err) {
+      console.error("❌ Erreur enregistrement IMC :", err);
     }
 
     setTaille("");
@@ -71,89 +63,122 @@ const BMI = () => {
     setAge("");
   };
 
+  const fetchIMC = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/imc`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setImcData(data);
+      } else {
+        setImcData(null);
+      }
+    } catch (err) {
+      console.error("Erreur récupération IMC :", err);
+    }
+  };
+
+  const fetchHistory = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch("http://localhost:5000/imc/history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const formatted = data.map((entry) => ({
+          ...entry,
+          date: new Date(entry.created_at).toLocaleString("fr-FR", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+          }),
+        }));
+        setBmiList(formatted);
+      }
+    } catch (err) {
+      console.error("Erreur historique IMC :", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadAll = async () => {
+      await fetchIMC();
+      await fetchHistory();
+      setLoading(false);
+    };
+    loadAll();
+  }, []);
+
   return (
-    <div>
-      <h2 style={{ color: "red" }}>Calcul IMC</h2>
+    <div style={{ padding: "2rem", color: "white", maxWidth: "900px", margin: "auto" }}>
+      <h2 style={{ textAlign: "center", color: "red" }}>Suivi IMC</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          placeholder="Taille en cm"
-          value={taille}
-          onChange={(e) => setTaille(e.target.value)}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Poids en kg"
-          value={poids}
-          onChange={(e) => setPoids(e.target.value)}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Âge"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          required
-        />
-        <button type="submit">Calculer</button>
-      </form>
-
-      {imc && (
-        <div>
-          <p>Vous avez un IMC de : <strong>{imc}</strong></p>
+      {loading ? (
+        <p>Chargement...</p>
+      ) : imcData === null ? (
+        <div style={{ textAlign: "center", marginTop: "2rem", color: "#facc15" }}>
+          <h3>👋 Bienvenue !</h3>
           <p>
-            Votre IMC indique :{" "}
-            <span style={{ color: categorie.color }}>{categorie.label}</span>
+            Vous n'avez pas encore renseigné votre IMC. Veuillez remplir le formulaire ci-dessous pour commencer.
           </p>
-
-          {objectifPoids > 0 && (
-            <p>
-              Vous devez perdre <strong>{objectifPoids} kg</strong> pour atteindre un IMC{" "}
-              <span style={{ color: "green" }}>Corpulence normale</span>
-            </p>
-          )}
-
-          <table border="1" cellPadding="10" style={{ marginTop: "1rem" }}>
-            <thead>
-              <tr>
-                <th>Niveau</th>
-                <th>Programme conseillé</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Débutant</td>
-                <td><u>Perte de poids</u></td>
-              </tr>
-              <tr>
-                <td>Intermédiaire</td>
-                <td><u>Début Solid</u></td>
-              </tr>
-              <tr>
-                <td>Confirmé</td>
-                <td><u>Solid Shred</u></td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h3 style={{ marginTop: "2rem" }}>Historique des IMC</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={bmiList}>
-              <Line type="monotone" dataKey="imc" stroke="#8884d8" strokeWidth={2} />
-              <CartesianGrid stroke="#ccc" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, "auto"]} />
-              <Tooltip />
-            </LineChart>
-          </ResponsiveContainer>
-
-          <button onClick={() => window.location.reload()} style={{ marginTop: "1rem" }}>
-            Recommencer
-          </button>
         </div>
+      ) : (
+        <>
+          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+            <p>Dernier IMC : <strong>{imcData.imc}</strong></p>
+            <p>Catégorie : <span style={{ color: getCategorie(imcData.imc).color }}>{getCategorie(imcData.imc).label}</span></p>
+            <p>Poids : {imcData.poids} kg | Taille : {imcData.taille} cm | Âge : {imcData.age}</p>
+            <p>Date : {new Date(imcData.created_at).toLocaleString("fr-FR")}</p>
+          </div>
+
+          <div style={{ marginTop: "2rem" }}>
+            <h3 style={{ textAlign: "center" }}>Historique des IMC</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={bmiList}>
+                <Line type="monotone" dataKey="imc" stroke="#00ccff" strokeWidth={2} />
+                <CartesianGrid stroke="#444" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, "auto"]} />
+                <Tooltip />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </>
       )}
+
+      <div style={{ marginTop: "3rem", maxWidth: "300px", marginInline: "auto" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <input type="number" placeholder="Taille en cm" value={taille} onChange={(e) => setTaille(e.target.value)} required />
+          <input type="number" placeholder="Poids en kg" value={poids} onChange={(e) => setPoids(e.target.value)} required />
+          <input type="number" placeholder="Âge" value={age} onChange={(e) => setAge(e.target.value)} required />
+          <button
+            type="submit"
+            style={{
+              backgroundColor: "#facc15",
+              border: "none",
+              padding: "0.6rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Valider
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
