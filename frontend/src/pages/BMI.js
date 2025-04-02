@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../config"; 
 import {
   LineChart,
   Line,
@@ -35,7 +36,7 @@ const BMI = () => {
     if (!token) return alert("Veuillez vous connecter.");
 
     try {
-      const res = await fetch("http://localhost:5000/imc", {
+      const res = await fetch(`${API_BASE_URL}/imc`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +68,7 @@ const BMI = () => {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:5000/imc", {
+      const res = await fetch(`${API_BASE_URL}/imc`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

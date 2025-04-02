@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -11,10 +13,8 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("http://localhost:5000/login", {
-        username,
-        password,
-      });
+      const { data } = await axios.post(`${API_BASE_URL}/login`, { username, password });
+
 
       localStorage.setItem("token", data.token);
       setMessage("Connexion réussie !");

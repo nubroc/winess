@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import { useEffect, useState } from "react";
 
 const Profile = () => {
@@ -8,33 +9,33 @@ const Profile = () => {
 
   const token = localStorage.getItem("token");
 
-  const fetchUserProfile = async () => {
-    const res = await fetch("http://localhost:5000/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setUser(data);
-  };
-
-  const fetchIMC = async () => {
-    const res = await fetch("http://localhost:5000/imc", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setImcData(data);
-  };
-
-  const fetchProgram = async () => {
-    const res = await fetch("http://localhost:5000/program", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.status === 200) {
-      const data = await res.json();
-      setProgram(data);
-    }
-  };
-
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      const res = await fetch(`${API_BASE_URL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setUser(data);
+    };
+
+    const fetchIMC = async () => {
+      const res = await fetch(`${API_BASE_URL}/imc`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setImcData(data);
+    };
+
+    const fetchProgram = async () => {
+      const res = await fetch(`${API_BASE_URL}/program`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 200) {
+        const data = await res.json();
+        setProgram(data);
+      }
+    };
+
     const loadData = async () => {
       try {
         await fetchUserProfile();
@@ -46,8 +47,9 @@ const Profile = () => {
         setLoading(false);
       }
     };
+
     loadData();
-  }, []);
+  }, [token]);
 
   const getCategorie = (imc) => {
     if (imc < 18.5) return "Maigreur";
@@ -60,16 +62,16 @@ const Profile = () => {
 
   return (
     <div style={{ padding: "2rem", color: "white", maxWidth: "800px", margin: "0 auto" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "2rem" }}>Bienvenue {user.username} 👋</h2>
+      <h2 style={{ textAlign: "center", marginBottom: "2rem" }}>
+        Bienvenue {user.username} 👋
+      </h2>
 
-      {/* Carte Infos utilisateur */}
       <div style={cardStyle}>
         <h3>Informations personnelles</h3>
         <p><strong>Nom d'utilisateur :</strong> {user.username}</p>
         <p><strong>Email :</strong> {user.email}</p>
       </div>
 
-      {/* Carte IMC */}
       {imcData ? (
         <div style={cardStyle}>
           <h3>Dernier IMC</h3>
@@ -83,7 +85,6 @@ const Profile = () => {
         <p style={{ marginTop: "1rem" }}>Aucun IMC renseigné.</p>
       )}
 
-      {/* Carte Programme */}
       {program ? (
         <div style={cardStyle}>
           <h3>Programme sportif</h3>
@@ -101,7 +102,6 @@ const Profile = () => {
   );
 };
 
-// Style de carte réutilisable
 const cardStyle = {
   backgroundColor: "#1e1e1e",
   padding: "1.5rem",

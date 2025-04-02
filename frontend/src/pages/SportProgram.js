@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { API_BASE_URL } from "../config";
 
 const SportProgram = () => {
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -38,7 +39,7 @@ const SportProgram = () => {
     setLoading(true);
 
     try {
-      await fetch("http://localhost:5000/program", {
+      await fetch(`${API_BASE_URL}/program`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
