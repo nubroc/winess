@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "./logo.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -12,7 +13,9 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <a href="/" className="logo">winess</a>
+      <Link to="/" className="logo">
+        <img src={logo} alt="Winess Logo" className="logo-image" />
+      </Link>
 
       <div className="buttons">
         {!token ? (
