@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { API_BASE_URL } from "../config";
-
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -13,7 +11,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_BASE_URL}/register`, {
+      const response = await axios.post("http://localhost:5000/register", {
         username,
         email,
         password,

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { API_BASE_URL } from "../config";
 
 const Welcome = () => {
   const [user, setUser] = useState(null);
@@ -15,7 +14,7 @@ const Welcome = () => {
     }
 
     axios
-      .get(`${API_BASE_URL}/profile`, {
+      .get("http://localhost:5000/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

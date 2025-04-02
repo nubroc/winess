@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "../styles.css";
-import { API_BASE_URL } from "../config"; 
 
 const Dietetic = () => {
   const [weight, setWeight] = useState(70);
@@ -44,7 +43,7 @@ const Dietetic = () => {
   const saveDietToDatabase = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch(`${API_BASE_URL}/diet`, {
+      fetch("http://localhost:5000/diet", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
