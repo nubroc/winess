@@ -1,6 +1,11 @@
-CREATE DATABASE IF NOT EXISTS winess CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Création de la base de données
+CREATE DATABASE IF NOT EXISTS winess
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
 USE winess;
 
+-- Table des utilisateurs
 CREATE TABLE IF NOT EXISTS users (
   id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -10,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Table des métriques utilisateur (IMC)
 CREATE TABLE IF NOT EXISTS user_metrics (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -21,22 +27,24 @@ CREATE TABLE IF NOT EXISTS user_metrics (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_diets (
-  id INT AUTO_INCREMENT PRIMARY KEY, 
-  user_id INT NOT NULL,
-  weight FLOAT NOT NULL,
-  program VARCHAR(255) NOT NULL,
-  recipes JSON NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
+-- Table des programmes sportifs
 CREATE TABLE IF NOT EXISTS user_programs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   imc FLOAT NOT NULL,
   programme TEXT NOT NULL,
   image_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Table des programmes diététiques
+CREATE TABLE IF NOT EXISTS user_diets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  weight FLOAT NOT NULL,
+  program VARCHAR(255) NOT NULL,
+  recipes JSON NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

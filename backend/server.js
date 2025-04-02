@@ -23,13 +23,14 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  ssl: { rejectUnauthorized: false },
 });
 
 db.connect((err) => {
   if (err) {
-    console.error("❌ Erreur de connexion à MySQL:", err);
+    console.error("Erreur de connexion à MySQL:", err);
   } else {
-    console.log("✅ Connecté à la base de données MySQL");
+    console.log("Connecté à la base de données MySQL");
   }
 });
 
@@ -49,7 +50,7 @@ function authenticateToken(req, res, next) {
 app.get("/test-db", (req, res) => {
   db.query("SELECT 1", (err) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
-    res.json({ success: true, message: "Connexion DB OK ✅" });
+    res.json({ success: true, message: "Connexion DB OK" });
   });
 });
 
@@ -191,7 +192,27 @@ app.post("/diet", authenticateToken, (req, res) => {
   );
 });
 
+app.delete("/delete-account", authenticateToken, (req, res) => {
+  const { confirmUsername } = req.body;
+  const userId = req.user.id;
+
+  db.query("SELECT username FROM users WHERE id = ?", [userId], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erreur serveur" });
+    if (results.length === 0) return res.status(404).json({ error: "Utilisateur non trouvé" });
+
+    const actualUsername = results[0].username;
+    if (confirmUsername !== actualUsername) {
+      return res.status(400).json({ error: "Nom d'utilisateur incorrect" });
+    }
+
+    db.query("DELETE FROM users WHERE id = ?", [userId], (err) => {
+      if (err) return res.status(500).json({ error: "Erreur lors de la suppression" });
+      res.json({ message: "Compte supprimé avec succès" });
+    });
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Serveur backend démarré sur le port ${PORT}`);
+  console.log(`Serveur backend démarré sur le port ${PORT}`);
 });

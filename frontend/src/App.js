@@ -8,7 +8,8 @@ import Dashboard from "./pages/Dashboard";
 import Welcome from "./pages/Welcome";
 import BMI from "./pages/BMI";
 import SportProgram from "./pages/SportProgram";
-import Profile from "./pages/Profile"; // Ajout ici
+import Profile from "./pages/Profile";
+import DeleteAccount from "./pages/DeleteAccount"; 
 import "./styles.css";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/bmi" element={<BMI />} />
           <Route path="/sport-program" element={<SportProgram />} />
           <Route path="/dietetic" element={<Dietetic />} />
+          <Route path="/delete-account" element={<DeleteAccount />} /> {/* New route */}
         </Routes>
       </div>
     </Router>
