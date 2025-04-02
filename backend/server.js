@@ -9,7 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Ajout de headers CORS personnalisés pour autoriser les tokens
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -19,7 +18,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔌 Connexion à la base de données
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -35,7 +33,6 @@ db.connect((err) => {
   }
 });
 
-// 🔐 Middleware de vérification du token JWT
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -49,7 +46,6 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// ✅ Test de connexion à la BDD
 app.get("/test-db", (req, res) => {
   db.query("SELECT 1", (err) => {
     if (err) return res.status(500).json({ success: false, error: err.message });
@@ -57,7 +53,6 @@ app.get("/test-db", (req, res) => {
   });
 });
 
-// ✅ Inscription
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,7 +72,6 @@ app.post("/register", async (req, res) => {
   });
 });
 
-// ✅ Connexion
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -94,7 +88,6 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ✅ Récupération du profil
 app.get("/profile", authenticateToken, (req, res) => {
   db.query(
     "SELECT username, email FROM users WHERE id = ?",
@@ -106,7 +99,6 @@ app.get("/profile", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Enregistrement de l’IMC
 app.post("/imc", authenticateToken, (req, res) => {
   const { taille, poids, imc, age } = req.body;
   const userId = req.user.id;
@@ -124,7 +116,6 @@ app.post("/imc", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Dernier IMC
 app.get("/imc", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -139,7 +130,6 @@ app.get("/imc", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Historique IMC
 app.get("/imc/history", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -153,7 +143,6 @@ app.get("/imc/history", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Programme sportif
 app.post("/program", authenticateToken, (req, res) => {
   const { imc, programme, image_url } = req.body;
   const userId = req.user.id;
@@ -185,7 +174,6 @@ app.get("/program", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Programme diététique (bonus)
 app.post("/diet", authenticateToken, (req, res) => {
   const { weight, program, recipes } = req.body;
   const userId = req.user.id;
@@ -203,7 +191,6 @@ app.post("/diet", authenticateToken, (req, res) => {
   );
 });
 
-// ✅ Lancement du serveur
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Serveur backend démarré sur le port ${PORT}`);
